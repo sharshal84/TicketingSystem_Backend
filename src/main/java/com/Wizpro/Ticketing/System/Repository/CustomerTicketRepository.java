@@ -15,8 +15,8 @@ import java.util.List;
 @EnableJpaRepositories
 public interface CustomerTicketRepository extends JpaRepository<CustomerTicket,Long> {
 
-//    @Query(value = "select t.*,p.product from customer_ticket t inner join product p where t.pid=p.id",nativeQuery = true)
-//    List<Ticket> findAllTickets();
+    @Query(value = "select t.*,p.product from customer_ticket t inner join product p where t.product=p.id",nativeQuery = true)
+    List<CustomerTicket> findAllTickets();
 //
     @Query(value = "Select * from CustomerTicket t where t.id=:id",nativeQuery = true)
     CustomerTicket findByFile(@Param("id") Integer id);
@@ -48,4 +48,7 @@ public interface CustomerTicketRepository extends JpaRepository<CustomerTicket,L
     @Modifying
     @Query("update CustomerTicket ct set ct.assign=:name where ct.id=:tid")
     Integer updateAssign(@Param("tid")Long tid, String name);
+
+
+    Long countByStatus(String status);
 }

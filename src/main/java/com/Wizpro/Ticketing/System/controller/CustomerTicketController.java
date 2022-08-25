@@ -268,6 +268,36 @@ public class CustomerTicketController {
         }
         return str;
     }
+    @GetMapping("/getTickets")
+    public List getTickets()
+    {
+        List<TicketResponse>ticketResponseList=new ArrayList<>();
+        List<CustomerTicket>tickets=customerTicketRepository.findAllTickets();
+        tickets.stream().forEach((ticket)->{
+            Optional<Product> optionalProduct=productRepository.findById(ticket.getProduct());
+            TicketResponse ticketResponse=new TicketResponse();
+            ticketResponse.setId(ticket.getId());
+            ticketResponse.setDescription(ticket.getDescription());
+            ticketResponse.setCreated_at(ticket.getCreated_at());
+            if (optionalProduct.isPresent())
+            {
+                Product product=optionalProduct.get();
+                ticketResponse.setCustomer_product(product.getProduct());
+            }
+            ticketResponse.setSerialnumber(ticket.getSerialnumber());
+            ticketResponse.setRemark(ticket.getRemark());
+            String url= ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/getFile/")
+                    .path(String.valueOf(ticket.getId()))
+                    .toUriString();
+            ticketResponse.setFile(url);
+            ticketResponse.setStatus(ticket.getStatus());
+//            System.out.println(ticketResponse);
+            ticketResponseList.add(ticketResponse);
+        }
+        );
+        return ticketResponseList;
+    }
     @GetMapping("/getCommentBy/{id}")
     public List<CommentResponse> getComments(@PathVariable Long id)
     {

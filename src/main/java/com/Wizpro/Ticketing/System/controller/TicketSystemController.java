@@ -1,16 +1,14 @@
 package com.Wizpro.Ticketing.System.controller;
 
 import com.Wizpro.Ticketing.System.Entities.*;
-import com.Wizpro.Ticketing.System.Repository.CustomerRepository;
-import com.Wizpro.Ticketing.System.Repository.LoginRepository;
-import com.Wizpro.Ticketing.System.Repository.ProductRepository;
-import com.Wizpro.Ticketing.System.Repository.UserRepository;
+import com.Wizpro.Ticketing.System.Repository.*;
 import lombok.Generated;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -29,6 +27,9 @@ public class TicketSystemController {
 
     @Autowired
     LoginRepository loginRepository;
+
+    @Autowired
+    CustomerTicketRepository customerTicketRepository;
 
     @Autowired
     Login login;
@@ -165,6 +166,32 @@ public class TicketSystemController {
 
         return customers;
     }
+    @GetMapping("/setStatusInprogress/{id}")
+    public String setStatus(@PathVariable Long id)
+    {
+//        System.out.println(id+" "+status);
+        Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(id);
+        if(customerTicket.isPresent())
+        {
+            CustomerTicket customerTicket1=customerTicket.get();
+            customerTicket1.setStatus("Inprogress");
+            customerTicketRepository.save(customerTicket1);
+        }
+        return new String("Successfull");
+    }
+    @GetMapping("/setStatusCompleted/{id}")
+    public String setStatusCompleted(@PathVariable Long id)
+    {
+//        System.out.println(id+" "+status);
+        Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(id);
+        if(customerTicket.isPresent())
+        {
+            CustomerTicket customerTicket1=customerTicket.get();
+            customerTicket1.setStatus("Completed");
+            customerTicketRepository.save(customerTicket1);
+        }
+        return new String("Successfull");
+    }
     @GetMapping("/getProducts")
     public List getProducts()
     {
@@ -185,7 +212,27 @@ public class TicketSystemController {
 
         return products;
     }
-
+    @GetMapping("/countTickets")
+    public int countTickets()
+    {
+        int x= (int) customerTicketRepository.count();
+//        System.out.println(x);
+        return x;
+    }
+    @GetMapping("/countByCompleted")
+    public Long countTicketsByStatusCompleted()
+    {
+        long x= customerTicketRepository.countByStatus("Completed");
+//        System.out.println(x);
+        return x;
+    }
+    @GetMapping("/countByInprogress")
+    public Long countTicketsByStatusInprogress()
+    {
+        Long x= customerTicketRepository.countByStatus("Inprogress");
+//        System.out.println(x);
+        return x;
+    }
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable Integer id)
     {
