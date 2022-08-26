@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 
     User findByEmail(String email);
 
-    @Query(nativeQuery = true,value = "select * from user except select * from user u where u.email=:name")
+    @Query(nativeQuery = true,value = "select * from user where user.email not in (select u.email from user u where u.email=:name)")
     List<User>findAllUserByName(String name);
 
     @Query(value = " select user_id from user_product up inner join user u on up.user_id=u.id where product_id=:id",nativeQuery = true)

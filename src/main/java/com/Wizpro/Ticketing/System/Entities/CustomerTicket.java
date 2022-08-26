@@ -1,9 +1,11 @@
 package com.Wizpro.Ticketing.System.Entities;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 
 @Entity
@@ -15,7 +17,9 @@ public class CustomerTicket {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String description;
-    private String created_at;
+    @CreationTimestamp
+    private Timestamp created_at;
+
     private String serialnumber;
     private String remark;
     private String status;
@@ -39,7 +43,7 @@ public class CustomerTicket {
     public CustomerTicket(Long id, String description, String created_at, String serialnumber, String remark, String status, String filename, String filetype, String assign, byte[] filedata, int product, int customer) {
         this.id = id;
         this.description = description;
-        this.created_at = created_at;
+        this.created_at = Timestamp.valueOf(created_at);
         this.serialnumber = serialnumber;
         this.remark = remark;
         this.status = status;
@@ -94,12 +98,12 @@ public class CustomerTicket {
         this.description = description;
     }
 
-    public String  getCreated_at() {
+    public Timestamp getCreated_at() {
         return created_at;
     }
 
     public void setCreated_at(String  created_at) {
-        this.created_at = created_at;
+        this.created_at = Timestamp.valueOf(created_at);
     }
 
     public String getSerialnumber() {

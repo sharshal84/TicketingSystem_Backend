@@ -73,12 +73,14 @@ public class TicketSystemController {
         user.setRole(role);
         user.setEnrollProduct(productList);
         userRepository.save(user);
+        System.out.println(user);
 
         login.setUsername(email);
         login.setPassword(password);
         login.setRole(role);
         User user2=userRepository.findById(user.getId()).get();
         login.setUser(user2);
+        System.out.println("Login "+login);
         loginRepository.save(login);
         return "ok";
     }
@@ -98,8 +100,9 @@ public class TicketSystemController {
     @PostMapping("/productsignup")
     public String signupProduct(@RequestBody Product product)
     {
+//        System.out.println(product.getProduct());
         productRepository.save(product);
-        System.out.println(product);
+//        System.out.println(product);
         return String.valueOf(product);
     }
     @PutMapping("/edituser/{id}")

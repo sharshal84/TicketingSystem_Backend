@@ -20,11 +20,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private String name;
-    private String email;
-    private String role;
-    @CollectionTable(schema = "String[]")
-    private String password;
 
     @Override
     public String toString() {
@@ -34,9 +29,15 @@ public class User {
                 ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
                 ", password='" + password + '\'' +
-
+                ", enrollProduct=" + enrollProduct +
                 '}';
     }
+
+    private String name;
+    private String email;
+    private String role;
+    @CollectionTable(schema = "String[]")
+    private String password;
 
     @ManyToMany(cascade = CascadeType.DETACH,fetch = FetchType.LAZY)
     @JoinTable(

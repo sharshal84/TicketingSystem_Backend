@@ -21,12 +21,15 @@ class UserRepositoryTest {
         System.out.println(list);
     }
     @Test
-    void findUsers()
+    public void getUsers()
     {
-        List list=userRepository.findEnrollProductBy(11);
-        for (Object o:list) {
-            System.out.println(o);
+//        return userRepository.findAll();
+//        List<User>list=userRepository.findAll();
+        List<User>list=userRepository.findUserAndProduct();
+        for (User u:list) {
+            System.out.println(u.getEnrollProduct());
         }
-
+        System.out.println(list);
+//        return userRepository.findUserAndProduct();
     }
 }

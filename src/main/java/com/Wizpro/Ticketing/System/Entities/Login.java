@@ -15,6 +15,19 @@ public class Login {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+
+    @Override
+    public String toString() {
+        return "Login{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", user=" + user +
+                ", customer=" + customer +
+                '}';
+    }
+
     private String username;
     private String password;
     private String role;
