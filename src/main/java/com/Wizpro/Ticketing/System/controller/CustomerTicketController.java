@@ -112,7 +112,7 @@ public class CustomerTicketController {
             ticketResponse.setSerialnumber(t.getSerialnumber());
             ticketResponse.setRemark(t.getRemark());
             ticketResponse.setDescription(t.getDescription());
-//            ticketResponse.setCreated_at(t.getCreated_at());
+            ticketResponse.setCreated_at(t.getCreated_at());
             ticketResponse.setAssignby(t.getAssign());
             Optional<Product> product=productRepository.findById(t.getProduct());
 
@@ -154,7 +154,7 @@ public class CustomerTicketController {
                    ticketResponse.setSerialnumber(t.getSerialnumber());
                    ticketResponse.setRemark(t.getRemark());
                    ticketResponse.setDescription(t.getDescription());
-                   ticketResponse.setCreated_at(String.valueOf(t.getCreated_at()));
+                   ticketResponse.setCreated_at((t.getCreated_at()));
                    ticketResponse.setCustomer_name(customer.getName());
 //                   System.out.println(t.getAssign());
                    Optional<Product> product=productRepository.findById(t.getProduct());

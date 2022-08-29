@@ -2,6 +2,8 @@ package com.Wizpro.Ticketing.System.Entities;
 
 import org.springframework.stereotype.Component;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 
 
@@ -10,7 +12,7 @@ public class TicketResponse {
 
     private Long id;
     private String description;
-    private String  created_at;
+    private Timestamp created_at;
     private String serialnumber;
     private String remark;
     private String status;
@@ -72,11 +74,11 @@ public class TicketResponse {
         this.description = description;
     }
 
-    public String getCreated_at() {
+    public Timestamp getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(String created_at) {
+    public void setCreated_at(Timestamp created_at) {
         this.created_at = created_at;
     }
 
