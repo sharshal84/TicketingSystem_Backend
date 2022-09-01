@@ -11,13 +11,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +51,8 @@ public class CustomerTicketController {
     @Autowired
     AssignTicketRepository assignTicketRepository;
 
+    Authentication authentication=new Authentication();
+
     String str="";
 
 //    @PostMapping("/saveTicket")
@@ -62,6 +64,7 @@ public class CustomerTicketController {
             @RequestParam("status") String status,
             @RequestParam("product") String product,
             @RequestParam("cust_name") String cust_name,
+            @RequestParam("location") String location,
             @RequestParam("file") MultipartFile file)throws IOException, InvalidDefinitionException
     {
         System.out.println(cust_name+" "+description+" "+serialnumber+" "+remark+" "+status+" "+product+" "+file.getOriginalFilename());
@@ -75,6 +78,7 @@ public class CustomerTicketController {
         ticket.setRemark(remark);
         ticket.setSerialnumber(serialnumber);
         ticket.setStatus(status);
+        ticket.setLocation(location);
         ticket.setCustomer(customer.getId());
 //        System.out.println(ticket);
         Long id=customerTicketRepository.save(ticket).getId();
@@ -95,34 +99,45 @@ public class CustomerTicketController {
         return "ok";
     }
     @GetMapping("/getTickets/{username}")
-    public List<TicketResponse> findAllticketsByUsers(@PathVariable String username)
-    {
-//        System.out.println(username);
-        List<TicketResponse>responses=new ArrayList<>();
+    public List<TicketResponse> findAllticketsByUsers(@PathVariable String username) {
+        System.out.println(username);
+        List<TicketResponse> responses = new ArrayList<>();
 //        List<CustomerTicket>list1=customerTicketRepository.findAll();
 //        List<Ticket>list=CustomerticketRepository.findAllTickets();
-        User user=userRepository.findByEmail(username);
-        List<CustomerTicket>list1=customerTicketRepository.findUserTickets(user.getId());
-        AssignTickets assignTickets=new AssignTickets();
+        User user = userRepository.findByEmail(username);
+        List<CustomerTicket> list1 = customerTicketRepository.findUserTickets(user.getId());
+        AssignTickets assignTickets = new AssignTickets();
         System.out.println(list1);
-        for (CustomerTicket t:list1) {
-            TicketResponse ticketResponse=new TicketResponse();
+        for (CustomerTicket t : list1) {
+            TicketResponse ticketResponse = new TicketResponse();
             ticketResponse.setId(t.getId());
             ticketResponse.setStatus(t.getStatus());
             ticketResponse.setSerialnumber(t.getSerialnumber());
             ticketResponse.setRemark(t.getRemark());
             ticketResponse.setDescription(t.getDescription());
-            ticketResponse.setCreated_at(t.getCreated_at());
-            ticketResponse.setAssignby(t.getAssign());
-            Optional<Product> product=productRepository.findById(t.getProduct());
 
-            if(product.isPresent())
-            {
-                Product product1=product.get();
+//            LocalDateTime now = LocalDateTime.now();
+//            System.out.println("Before Formatting: " + now);
+            DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formatDateTime = t.getCreated_at().format(format);
+//            System.out.println("After Formatting: " + formatDateTime);
+            ticketResponse.setCreated_at(formatDateTime);
+            ticketResponse.setAssignby(t.getAssign());
+
+            Optional<Customer> optionalCustomer = customerRepository.findById(t.getCustomer());
+            if (optionalCustomer.isPresent()) {
+                Customer customer = optionalCustomer.get();
+                ticketResponse.setCustomer(customer.getName());
+            }
+
+            Optional<Product> product = productRepository.findById(t.getProduct());
+
+            if (product.isPresent()) {
+                Product product1 = product.get();
 //                System.out.println(product1);
                 ticketResponse.setCustomer_product(product1.getProduct());
             }
-            String url= ServletUriComponentsBuilder.fromCurrentContextPath()
+            String url = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/getFile/")
                     .path(String.valueOf(t.getId()))
                     .toUriString();
@@ -153,8 +168,13 @@ public class CustomerTicketController {
                    ticketResponse.setStatus(t.getStatus());
                    ticketResponse.setSerialnumber(t.getSerialnumber());
                    ticketResponse.setRemark(t.getRemark());
+                   ticketResponse.setLocation(t.getLocation());
                    ticketResponse.setDescription(t.getDescription());
-                   ticketResponse.setCreated_at((t.getCreated_at()));
+                   DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                   String formatDateTime = t.getCreated_at().format(format);
+//            System.out.println("After Formatting: " + formatDateTime);
+                   ticketResponse.setCreated_at(formatDateTime);
+//                   ticketResponse.setCreated_at((t.getCreated_at()));
                    ticketResponse.setCustomer_name(customer.getName());
 //                   System.out.println(t.getAssign());
                    Optional<Product> product=productRepository.findById(t.getProduct());
@@ -233,13 +253,50 @@ public class CustomerTicketController {
             commentResponse.setRole(customer1.getName());
         }
         commentResponse.setMessage(comment.getMessage());
-        commentResponse.setTimestamp(comment.getTimestamp());
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String formatDateTime = comment.getTimestamp().format(format);
+        commentResponse.setTimestamp(formatDateTime);
 
         return commentResponse;
+    }
+    @GetMapping("/checkassignTicketTo/{uid}/{tid}")
+    public String checkassignTicketToUser(@PathVariable int uid,@PathVariable int tid,@PathVariable Optional<String> username)
+    {
+        System.out.println(uid+" "+tid+"  "+username);
+        User user=userRepository.findByEmail(String.valueOf(username));
+        AssignTickets assignTickets=assignTicketRepository.findByAll(uid,tid);
+        System.out.println(assignTickets);
+        if(assignTickets==null)
+        {
+            str="Assigned";
+//            System.out.println("No value found");
+//            List<AssignTickets> assignTickets1=assignTicketRepository.findByUser(user.getId());
+//            for (AssignTickets t:assignTickets1) {
+//
+////                System.out.println("All tickets"+t);
+//                if(tid==t.getTicket_id())
+//                {
+//                    System.out.println("Single ticket "+t);
+//                    Integer i=assignTicketRepository.updateUserSetStatusForName(Integer.valueOf(t.getId()),id,user.getName());
+//                    Integer z=customerTicketRepository.updateAssign(Long.valueOf(tid),user.getName());
+//                    if(i==1)
+//                    {
+//                        str="Assigned";
+//                    }
+//                }
+//            }
+        }
+        else
+        {
+//            System.out.println("Already assign to another user");
+            str="Already Assigned";
+        }
+        return str;
     }
     @GetMapping("/assignTicketTo/{id}/{tid}/{username}")
     public String assignTicketToUser(@PathVariable int id,@PathVariable int tid,@PathVariable String username)
     {
+//        System.out.println(id+" "+tid+"  "+username);
         User user=userRepository.findByEmail(username);
         AssignTickets assignTickets=assignTicketRepository.findByAll(id,tid);
         if(assignTickets==null)
@@ -327,7 +384,9 @@ public class CustomerTicketController {
                 commentResponse.setRole(customer1.getName());
             }
             commentResponse.setMessage(c.getMessage());
-            commentResponse.setTimestamp(c.getTimestamp());
+            DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formatDateTime = c.getTimestamp().format(format);
+            commentResponse.setTimestamp(formatDateTime);
             commentResponseList.add(commentResponse);
         }
 //        System.out.println(commentList);

@@ -2,9 +2,8 @@ package com.Wizpro.Ticketing.System.Entities;
 
 import org.springframework.stereotype.Component;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Component
@@ -12,13 +11,21 @@ public class TicketResponse {
 
     private Long id;
     private String description;
-    private Timestamp created_at;
+    private String created_at;
     private String serialnumber;
     private String remark;
     private String status;
     private String file;
+    private String location;
     private String  customer_product;
+    private String customer;
+    public String getCustomer() {
+        return customer;
+    }
 
+    public void setCustomer(String customer) {
+        this.customer = customer;
+    }
     private String assignby;
 
     @Override
@@ -55,7 +62,12 @@ public class TicketResponse {
 
     private String customer_name;
 
-    public TicketResponse() {
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public Long getId() {
@@ -74,11 +86,11 @@ public class TicketResponse {
         this.description = description;
     }
 
-    public Timestamp getCreated_at() {
+    public String getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(Timestamp created_at) {
+    public void setCreated_at(String created_at) {
         this.created_at = created_at;
     }
 

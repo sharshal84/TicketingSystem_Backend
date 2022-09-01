@@ -1,11 +1,13 @@
 package com.Wizpro.Ticketing.System.Entities;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,7 +19,8 @@ public class Comment {
     private int ticket_id;
     private int user_id;
     private int customer_id;
-    private String timestamp;
+    @CreationTimestamp
+    private LocalDateTime timestamp;
     private String message;
     @Override
     public String toString() {
@@ -46,15 +49,15 @@ public class Comment {
 
     }
 
-    public String getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
-    public Comment(Long id, int ticket_id, int user_id, int customer_id, String timestamp, String message) {
+    public Comment(Long id, int ticket_id, int user_id, int customer_id, LocalDateTime timestamp, String message) {
         this.id = id;
         this.ticket_id = ticket_id;
         this.user_id = user_id;

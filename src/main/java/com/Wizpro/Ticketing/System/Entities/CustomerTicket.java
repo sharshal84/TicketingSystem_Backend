@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -18,7 +19,7 @@ public class CustomerTicket {
     private Long id;
     private String description;
     @CreationTimestamp
-    private Timestamp created_at;
+    private LocalDateTime created_at;
 
     private String serialnumber;
     private String remark;
@@ -26,6 +27,14 @@ public class CustomerTicket {
     private String filename;
     private String filetype;
     private String assign;
+    private String location;
+
+    @Nullable
+    private int customer;
+    @Lob
+    private byte[] filedata;
+
+    private int product;
 
     public String getAssign() {
         return assign;
@@ -35,15 +44,10 @@ public class CustomerTicket {
         this.assign = assign;
     }
 
-    @Lob
-    private byte[] filedata;
-
-    private int product;
-
-    public CustomerTicket(Long id, String description, String created_at, String serialnumber, String remark, String status, String filename, String filetype, String assign, byte[] filedata, int product, int customer) {
+    public CustomerTicket(Long id, String description,String location, LocalDateTime created_at, String serialnumber, String remark, String status, String filename, String filetype, String assign, byte[] filedata, int product, int customer) {
         this.id = id;
         this.description = description;
-        this.created_at = Timestamp.valueOf(created_at);
+        this.created_at = created_at;
         this.serialnumber = serialnumber;
         this.remark = remark;
         this.status = status;
@@ -53,9 +57,10 @@ public class CustomerTicket {
         this.filedata = filedata;
         this.product = product;
         this.customer = customer;
+        this.location=location;
     }
 
-    public CustomerTicket(String description, String serialnumber, String remark, String status, String originalFilename, String contentType, byte[] bytes, int product, int customer) {
+    public CustomerTicket(String description,String location, String serialnumber, String remark, String status, String originalFilename, String contentType, byte[] bytes, int product, int customer) {
     this.description=description;
     this.serialnumber=serialnumber;
     this.remark=remark;
@@ -65,6 +70,14 @@ public class CustomerTicket {
     this.filedata=bytes;
     this.product=product;
     this.customer=customer;
+    this.location=location;
+    }
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public int getProduct() {
@@ -79,8 +92,7 @@ public class CustomerTicket {
 //    @OneToOne(cascade = CascadeType.DETACH)
 //    @JoinColumn(name = "p_id",referencedColumnName = "id")
 //    private Product customer_product;
-    @Nullable
-    private int customer;
+
 
     public Long getId() {
         return id;
@@ -98,12 +110,12 @@ public class CustomerTicket {
         this.description = description;
     }
 
-    public Timestamp getCreated_at() {
+    public LocalDateTime getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(String  created_at) {
-        this.created_at = Timestamp.valueOf(created_at);
+    public void setCreated_at(LocalDateTime  created_at) {
+        this.created_at = created_at;
     }
 
     public String getSerialnumber() {

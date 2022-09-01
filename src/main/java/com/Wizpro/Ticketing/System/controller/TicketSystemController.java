@@ -32,6 +32,9 @@ public class TicketSystemController {
     CustomerTicketRepository customerTicketRepository;
 
     @Autowired
+    TicketStatusAuditRepository ticketStatusAuditRepository;
+
+    @Autowired
     Login login;
 
     @Autowired
@@ -154,8 +157,10 @@ public class TicketSystemController {
         List<User> list=userRepository.findAllUserByName(username);
         for (User u:list) {
             UserListResponse userListResponse=new UserListResponse();
-            userListResponse.setKey(u.getId());
+//            userListResponse.setKey(u.getId());
             userListResponse.setLabel(u.getName());
+            userListResponse.setValue(u.getId());
+
             userListResponseList.add(userListResponse);
         }
         return userListResponseList;
@@ -182,18 +187,29 @@ public class TicketSystemController {
         }
         return new String("Successfull");
     }
-    @GetMapping("/setStatusCompleted/{id}")
-    public String setStatusCompleted(@PathVariable Long id)
+    @GetMapping("/createTicketStatusAudit/{ticketid}/{userid}/{status}")
+    public String setStatusCompleted(@PathVariable Long ticketid,@PathVariable Long userid,@PathVariable String status)
     {
-//        System.out.println(id+" "+status);
-        Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(id);
-        if(customerTicket.isPresent())
+        TicketStatusAudit ticketStatusAudit=new TicketStatusAudit();
+
+        Optional<CustomerTicket> optionalCustomerTicket=customerTicketRepository.findById(ticketid);
+        if(optionalCustomerTicket.isPresent())
         {
-            CustomerTicket customerTicket1=customerTicket.get();
-            customerTicket1.setStatus("Completed");
-            customerTicketRepository.save(customerTicket1);
+            CustomerTicket ticket=optionalCustomerTicket.get();
+            ticketStatusAudit.setCustomer_id((long) ticket.getCustomer());
         }
-        return new String("Successfull");
+        Optional<User> optionalUser=userRepository.findById(Math.toIntExact(userid));
+        if(optionalUser.isPresent())
+        {
+            User user=optionalUser.get();
+            ticketStatusAudit.setUser_id((long) user.getId());
+//            System.out.println(user.getId());
+        }
+        ticketStatusAudit.setTicket_id(ticketid);
+        ticketStatusAudit.setDummy_status(status);
+//        System.out.println(id+" "+status);
+//        ticketStatusAuditRepository.save(ticketStatusAudit);
+        return new String("successfull");
     }
     @GetMapping("/getProducts")
     public List getProducts()

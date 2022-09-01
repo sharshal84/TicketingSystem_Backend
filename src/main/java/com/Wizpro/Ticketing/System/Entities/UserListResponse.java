@@ -9,4 +9,5 @@ public class UserListResponse {
 
     private int key;
     private String label;
+    private int value;
 }
