@@ -18,8 +18,8 @@ public interface CustomerTicketRepository extends JpaRepository<CustomerTicket,L
     @Query(value = "select t.*,p.product from customer_ticket t inner join product p where t.product=p.id",nativeQuery = true)
     List<CustomerTicket> findAllTickets();
 //
-    @Query(value = "Select * from CustomerTicket t where t.id=:id",nativeQuery = true)
-    CustomerTicket findByFile(@Param("id") Integer id);
+    @Query(value = "Select t From CustomerTicket t where t.id=:id")
+    CustomerTicket findByFileName(Long id);
 
     @Query(nativeQuery = true,value = "select t.*,p.product,at.assignby from customer_ticket t inner join product p on t.product=p.id inner join assign_tickets at on at.ticket=t.id where at.user=:id")
 //    @Query(value = "select t.*,p.product from user u inner join user_product up on u.id=up.user_id inner join product p on p.id=up.product_id inner join customer_ticket t on t.product=p.id where u.id=:id order by t.id",nativeQuery = true)

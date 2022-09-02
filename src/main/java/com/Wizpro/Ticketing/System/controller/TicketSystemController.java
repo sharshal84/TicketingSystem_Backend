@@ -6,6 +6,8 @@ import lombok.Generated;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -48,9 +50,12 @@ public class TicketSystemController {
     @PostMapping("/login")
     public Login login(@RequestBody Login login)
     {
+        System.out.println(login.getUsername()+" "+login.getPassword());
 //        Login users=loginRepository.findByUsernameAndPassword(login.getUsername(),login.getPassword());
 //        Login login1=loginRepository.findAllByName(login.getUsername(),login.getPassword());
 //        System.out.println(login1);
+
+
         return loginRepository.findByUsernameAndPassword(login.getUsername(),login.getPassword());
     }
     @PostMapping("/usersignup")
@@ -82,7 +87,7 @@ public class TicketSystemController {
         login.setPassword(password);
         login.setRole(role);
         User user2=userRepository.findById(user.getId()).get();
-        login.setUser(user2);
+        login.setUser(user2.getId());
         System.out.println("Login "+login);
         loginRepository.save(login);
         return "ok";
@@ -95,7 +100,7 @@ public class TicketSystemController {
         login.setPassword(customer.getPassword());
         login.setRole("customer");
         Customer customer1=customerRepository.findById(customer.getId()).get();
-        login.setCustomer(customer1);
+        login.setCustomer(customer1.getId());
 //        login.setUser_id(customer.getId());
         loginRepository.save(login);
         return String.valueOf(customer);
@@ -177,7 +182,7 @@ public class TicketSystemController {
     @GetMapping("/setStatusInprogress/{id}")
     public String setStatus(@PathVariable Long id)
     {
-//        System.out.println(id+" "+status);
+        System.out.println(id);
         Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(id);
         if(customerTicket.isPresent())
         {
@@ -187,9 +192,23 @@ public class TicketSystemController {
         }
         return new String("Successfull");
     }
+    @GetMapping("/setStatusCompleted/{id}")
+    public String setStatusClose(@PathVariable Long id)
+    {
+        System.out.println(id);
+        Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(id);
+        if(customerTicket.isPresent())
+        {
+            CustomerTicket customerTicket1=customerTicket.get();
+            customerTicket1.setStatus("Closed");
+            customerTicketRepository.save(customerTicket1);
+        }
+        return new String("Successfull");
+    }
     @GetMapping("/createTicketStatusAudit/{ticketid}/{userid}/{status}")
     public String setStatusCompleted(@PathVariable Long ticketid,@PathVariable Long userid,@PathVariable String status)
     {
+        System.out.println(ticketid+" "+userid+" "+status);
         TicketStatusAudit ticketStatusAudit=new TicketStatusAudit();
 
         Optional<CustomerTicket> optionalCustomerTicket=customerTicketRepository.findById(ticketid);
@@ -208,8 +227,58 @@ public class TicketSystemController {
         ticketStatusAudit.setTicket_id(ticketid);
         ticketStatusAudit.setDummy_status(status);
 //        System.out.println(id+" "+status);
-//        ticketStatusAuditRepository.save(ticketStatusAudit);
+        ticketStatusAuditRepository.save(ticketStatusAudit);
+
+        Optional<CustomerTicket> customerTicket=customerTicketRepository.findById(ticketid);
+        if(customerTicket.isPresent())
+        {
+            CustomerTicket customerTicket1=customerTicket.get();
+            customerTicket1.setStatus("Complete");
+            customerTicketRepository.save(customerTicket1);
+        }
         return new String("successfull");
+    }
+    @GetMapping("/getTicketStatusAudit/{cname}")
+    public List<TicketStatusAudit> getTicketStatusAudit(@PathVariable String cname)
+    {
+        List<TicketStatusAudit> responseList=new ArrayList<>();
+        System.out.println("Customer "+cname);
+        Optional<Customer> optionalCustomer =customerRepository.findByEmail(cname);
+        if(optionalCustomer.isPresent())
+        {
+            Customer customer=optionalCustomer.get();
+            List<TicketStatusAudit> ticketStatusAuditList=ticketStatusAuditRepository.findByCustomer_id((long) customer.getId());
+            for (TicketStatusAudit status:ticketStatusAuditList) {
+                responseList.add(status);
+            }
+        }
+        return responseList;
+    }
+    @GetMapping("/getSingleTicketStatusAudit/{tid}")
+    public ResponseEntity<Map> getSingleTicketStatusAudit(@PathVariable Long tid)
+    {
+            Map<String,String>stringMap=new HashMap<>();
+            TicketStatusAudit ticketStatusAudit=ticketStatusAuditRepository.findByTicket_id(tid);
+            if(ticketStatusAudit==null)
+            {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                        Collections.singletonMap("data", "There is no ticketStatus Created"));
+//                return new ResponseEntity<Map>(Map.of("error","TicketStatus Not Created"),HttpStatus.NO_CONTENT);
+            }
+            else
+            {
+                System.out.println(ticketStatusAudit);
+                Optional<User>optionalUser=userRepository.findById(Math.toIntExact(ticketStatusAudit.getUser_id()));
+                if(optionalUser.isPresent())
+                {
+                    User user=optionalUser.get();
+                    stringMap.put("user",user.getName());
+                    stringMap.put("status",ticketStatusAudit.getDummy_status());
+                    stringMap.put("date",String.valueOf(ticketStatusAudit.getDummy_created_at()));
+                }
+            }
+        System.out.println(ticketStatusAudit);
+        return new ResponseEntity<Map>((stringMap),HttpStatus.OK);
     }
     @GetMapping("/getProducts")
     public List getProducts()

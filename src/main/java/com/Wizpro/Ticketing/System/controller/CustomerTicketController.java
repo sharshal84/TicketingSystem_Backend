@@ -75,6 +75,8 @@ public class CustomerTicketController {
         ticket.setProduct(product1.getId());
         ticket.setDescription(description);
         ticket.setFiledata(file.getBytes());
+        ticket.setFilename(file.getOriginalFilename());
+        ticket.setFiletype(file.getContentType());
         ticket.setRemark(remark);
         ticket.setSerialnumber(serialnumber);
         ticket.setStatus(status);
@@ -208,9 +210,9 @@ public class CustomerTicketController {
         return responses;
     }
     @GetMapping(value = "/getFile/{fileId}",produces = {MediaType.MULTIPART_FORM_DATA_VALUE, "application/json"})
-    public ResponseEntity<Resource> getFile(@PathVariable Integer fileId)throws InvalidDefinitionException
+    public ResponseEntity<Resource> getFile(@PathVariable Long fileId)throws InvalidDefinitionException
     {
-        CustomerTicket ticket=customerTicketRepository.findByFile(fileId);
+        CustomerTicket ticket=customerTicketRepository.findByFileName(fileId);
         ResponseEntity<Resource> image=ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(ticket.getFiletype()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ticket.getFilename() + "\"")

@@ -14,9 +14,10 @@ import java.util.List;
 @EnableJpaRepositories
 public interface LoginRepository extends JpaRepository<Login,Integer> {
 
+    @Query("Select l from Login l where l.username=:username and l.password=:password")
     Login findByUsernameAndPassword(String username,String password);
 
-    @Query(nativeQuery = true,value = "select l.user_id,l.id,l.role,l.username,l.password,l.customer_id from login l where l.username=:username and l.password=:password")
+    @Query(nativeQuery = true,value = "select l.id,l.role,l.username,l.password from login l where l.username=:username and l.password=:password")
     Login findAllByName(@Param("username")String username,@Param("password") String password);
 
 }

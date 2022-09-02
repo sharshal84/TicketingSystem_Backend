@@ -14,20 +14,7 @@ import javax.persistence.*;
 public class Login {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
-    @Override
-    public String toString() {
-        return "Login{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
-                ", user=" + user +
-                ", customer=" + customer +
-                '}';
-    }
-
+    private Integer id;
     private String username;
     private String password;
     private String role;
@@ -37,23 +24,24 @@ public class Login {
 
     }
 
-    public Login(int id, String username, String password, String role,Customer customer) {
+    public Login(int id, String username, String password, String role,Integer customer,Integer user) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
-        this.customer=customer;
+        this.customer_id=customer;
+        this.user_id=user;
     }
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.DETACH)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @JsonIgnore
+//    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.DETACH)
+    @Column(name = "user_id")
+    private Integer user_id;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.DETACH)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+//    @JsonIgnore
+//    @OneToOne(fetch = FetchType.LAZY,cascade =CascadeType.ALL)
+    @Column(name = "customer_id")
+    private Integer customer_id;
 
     public int getId() {
         return id;
@@ -87,20 +75,33 @@ public class Login {
         this.role = role;
     }
 
-    public User getUser() {
-        return user;
+    public Integer getUser() {
+        return user_id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(Integer user) {
+        this.user_id = user;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public Integer getCustomer() {
+        return customer_id;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomer(Integer customer) {
+        this.customer_id = customer;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Login{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", user=" + user_id +
+                ", customer=" + customer_id +
+                '}';
     }
 //    private String role;
 }

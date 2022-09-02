@@ -17,6 +17,21 @@ public class TicketStatusAudit {
     private Long ticket_id;
     private Long customer_id;
     private Long user_id;
+
+    @Override
+    public String toString() {
+        return "TicketStatusAudit{" +
+                "id=" + id +
+                ", ticket_id=" + ticket_id +
+                ", customer_id=" + customer_id +
+                ", user_id=" + user_id +
+                ", dummy_status='" + dummy_status + '\'' +
+                ", dummy_created_at=" + dummy_created_at +
+                ", updated_status='" + updated_status + '\'' +
+                ", updated_created_at=" + updated_created_at +
+                '}';
+    }
+
     private String dummy_status;
     @CreationTimestamp
     private LocalDateTime dummy_created_at;
